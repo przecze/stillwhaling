@@ -1,0 +1,10 @@
+node_modules/
+.venv/
+dist/
+*.log
+.DS_Store
+*.xlsx
+public/data/*.json
+
+# IWC data - license unclear, exclude from repo
+public/data/whaling_data.json
