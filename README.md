@@ -1,4 +1,5 @@
 # Still Whaling 🐋
+**Note:** vibe-coded project with minimal review - J.Cz 
 
 Interactive visualization of global whaling data from the [IWC (International Whaling Commission)](https://iwc.int/management-and-conservation/whaling/total-catches).
 
