@@ -179,8 +179,16 @@ function render() {
         </div>
         <div class="about-link-section">
           <h3>Inspiration</h3>
-          <a href="https://youtu.be/rTgwZR3T_uo" target="_blank" rel="noopener noreferrer">
-            YouTube Video
+          <a href="https://youtu.be/rTgwZR3T_uo" target="_blank" rel="noopener noreferrer" class="inspiration-link">
+            <div class="video-title">Whale Hunting Was Absolutely Crazy</div>
+            <div class="video-meta">by Nightshift – Kurzgesagt After Dark (Jan 30, 2026)</div>
+          </a>
+        </div>
+        <div class="about-link-section">
+          <h3>Author</h3>
+          <div class="about-author">Jan Czechowski 2026</div>
+          <a href="https://janczechowski.com" target="_blank" rel="noopener noreferrer">
+            janczechowski.com
           </a>
         </div>
       </div>
@@ -246,6 +254,16 @@ function render() {
   
   // Map (will call updateVisualization when ready)
   createMap(app as any);
+
+  // Add footer
+  app.append('footer')
+    .html(`
+      <div class="footer-content">
+        <span>© 2026 <a href="https://janczechowski.com" target="_blank" rel="noopener noreferrer">Jan Czechowski</a></span>
+        <span class="footer-divider">|</span>
+        <span>Data: <a href="https://iwc.int/management-and-conservation/whaling/total-catches" target="_blank" rel="noopener noreferrer">International Whaling Commision</a></span>
+      </div>
+    `);
   
   // Initial visualization will be triggered by createMap when paths are ready
   // No setTimeout hack needed - createMap calls updateVisualization directly
