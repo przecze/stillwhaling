@@ -470,6 +470,9 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
             showTooltip(event, countryCode);
           }
         })
+        .on('mousemove', function(event: MouseEvent) {
+          positionTooltip(event);
+        })
         .on('mouseleave', function() {
           hoveredCountry = null;
           clearHighlight();
@@ -783,6 +786,40 @@ function showTooltip(event: MouseEvent, countryCode: string) {
   `);
   
   tooltip.classed('visible', true);
+  positionTooltip(event);
+}
+
+function positionTooltip(event: MouseEvent) {
+  const tooltip = d3.select('.tooltip');
+  if (!tooltip.classed('visible')) return;
+
+  const x = event.clientX;
+  const y = event.clientY;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const tooltipNode = tooltip.node() as HTMLElement;
+  if (!tooltipNode) return;
+
+  const tooltipWidth = tooltipNode.offsetWidth;
+  const tooltipHeight = tooltipNode.offsetHeight;
+  
+  // Position lower-right by default
+  let left = x + 20;
+  let top = y + 20;
+  
+  // Flip to left if it would go off screen
+  if (left + tooltipWidth > width - 20) {
+    left = x - tooltipWidth - 20;
+  }
+  
+  // Flip to top if it would go off screen
+  if (top + tooltipHeight > height - 20) {
+    top = y - tooltipHeight - 20;
+  }
+  
+  tooltip
+    .style('left', `${left}px`)
+    .style('top', `${top}px`);
 }
 
 function hideTooltip() {
