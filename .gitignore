@@ -3,8 +3,8 @@ node_modules/
 dist/
 *.log
 .DS_Store
+# IWC data files - license unclear, exclude from repo
 *.xlsx
+data/*.xlsx
 public/data/*.json
-
-# IWC data - license unclear, exclude from repo
 public/data/whaling_data.json

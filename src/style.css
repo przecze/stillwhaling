@@ -324,7 +324,9 @@ h1 span {
 
 /* Tooltip */
 .tooltip {
-  position: absolute;
+  position: fixed;
+  top: 5rem;
+  right: 3rem;
   pointer-events: none;
   background: var(--bg-surface);
   border: 1px solid var(--grid-line);
@@ -333,7 +335,8 @@ h1 span {
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 100;
-  min-width: 180px;
+  min-width: 220px;
+  max-width: 320px;
 }
 
 .tooltip.visible {
@@ -422,6 +425,30 @@ h1 span {
 }
 
 /* Loading */
+.loading.error-panel {
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-message {
+  color: var(--text-muted);
+  margin-top: 1rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.error-hint {
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.command-note {
+  background: var(--bg-surface);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+}
+
 .loading {
   display: flex;
   align-items: center;

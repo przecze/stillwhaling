@@ -21,9 +21,8 @@ ansible-playbook deploy.yml
 1. Creates `/srv/projects/stillwhaling` on the server
 2. Syncs project files (excludes .git, node_modules, dist, etc.)
 3. Stops existing containers (`docker compose down`)
-4. Builds and starts Docker containers (`docker compose up -d --build`)
-   - `frontend`: Vite dev server (development mode)
-   - `nginx`: Nginx proxy that connects to nginx-proxy network
+4. Builds and starts Docker containers (`docker compose up -d --build site`)
+   - `site`: Production nginx image that serves the built `dist/` artifacts directly
 5. Connects to nginx-proxy network for automatic SSL/domain routing
 
 ## Safety
@@ -37,8 +36,8 @@ ansible-playbook deploy.yml
 
 1. **DNS**: Add A record for `stillwhaling.janczechowski.com` pointing to server IP
 2. **SSL**: Let's Encrypt will auto-provision via nginx-proxy
-3. **Data updates**: Update `public/data/whaling_data.json` and restart services:
+3. **Data updates**: Update `public/data/whaling_data.json` and restart the production site:
    ```bash
    cd /srv/projects/stillwhaling
-   docker compose restart frontend nginx
+   docker compose restart site
    ```
