@@ -46,8 +46,7 @@ services:
       target: production
     networks:
       - nginx-proxy
-    ports:
-      - 127.0.0.1:80:80
+    #ports: ["127.0.0.1:80:80"]
     environment:
       VIRTUAL_HOST: stillwhaling.fyi
       LETSENCRYPT_HOST: stillwhaling.fyi

@@ -46,7 +46,7 @@ http {
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
     add_header Cross-Origin-Opener-Policy "same-origin" always;
     add_header Cross-Origin-Resource-Policy "same-site" always;
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'${dev_script_policy}; style-src 'self' https://fonts.googleapis.com${dev_style_inline}; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://unpkg.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';" always;
+    add_header Content-Security-Policy "default-src 'none'; script-src 'self'${dev_script_policy}; style-src 'self' https://fonts.googleapis.com${dev_style_inline}; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://unpkg.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';" always;
 
     # --- Block common scanner paths ---
     location ~* \.(php|asp|aspx|jsp|cgi|pl|sh|py|rb)$ { return 404; }
