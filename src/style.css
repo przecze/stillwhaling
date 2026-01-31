@@ -168,6 +168,27 @@ h1 span {
   transition: color 0.2s ease;
 }
 
+.about-author {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.video-title {
+  font-weight: 500;
+  margin-bottom: 0.1rem;
+}
+
+.video-meta {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  color: var(--text-muted);
+}
+
+.inspiration-link:hover .video-meta {
+  color: var(--accent-warm);
+}
+
 .about-link-section a:hover {
   color: var(--accent-warm);
   text-decoration: underline;
@@ -467,4 +488,36 @@ h1 span {
 .loading::after {
   content: '...';
   animation: pulse 1.5s infinite;
+}
+
+/* Footer */
+footer {
+  padding: 0.75rem 3rem;
+  border-top: 1px solid var(--grid-line);
+  background: var(--bg-deep);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  z-index: 10;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-content a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-content a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.footer-divider {
+  color: var(--grid-line);
 }
