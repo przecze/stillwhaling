@@ -346,8 +346,6 @@ h1 span {
 /* Tooltip */
 .tooltip {
   position: fixed;
-  top: 5rem;
-  right: 3rem;
   pointer-events: none;
   background: var(--bg-surface);
   border: 1px solid var(--grid-line);
