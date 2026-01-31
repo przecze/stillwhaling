@@ -110,30 +110,18 @@ async function init() {
     console.log('Loading world map...');
     try {
       // Try multiple sources
-      const sources = [
-        'https://unpkg.com/world-atlas@2.0.2/world/110m.json',
-        'https://cdn.jsdelivr.net/npm/world-atlas@2/world/110m.json',
-        'https://unpkg.com/world-atlas@1.1.4/world/110m.json'
-      ];
-      
-      let loaded = false;
-      for (const url of sources) {
-        try {
-          const response = await fetch(url, { signal: AbortSignal.timeout(5000) });
-          if (response.ok) {
-            worldTopo = await response.json();
-            console.log(`✅ World map loaded from ${url}`);
-            loaded = true;
-            break;
-          }
-        } catch (err) {
-          // Continue to next source
-          continue;
+      const mapUrl = 'https://unpkg.com/world-atlas@1.1.4/world/110m.json';
+      try {
+        const response = await fetch(mapUrl, { signal: AbortSignal.timeout(5000) });
+        if (response.ok) {
+          worldTopo = await response.json();
+          console.log(`✅ World map loaded from ${mapUrl}`);
+        } else {
+          console.warn(`⚠️  World map request failed (${response.status})`);
+          worldTopo = createEmptyTopo();
         }
-      }
-      
-      if (!loaded) {
-        console.warn('⚠️  Could not load world map from any source - map will not display');
+      } catch (err) {
+        console.warn('⚠️  Could not load world map', err);
         worldTopo = createEmptyTopo();
       }
     } catch (error) {
@@ -145,16 +133,16 @@ async function init() {
   } catch (error) {
     console.error('Failed to load data:', error);
     app.innerHTML = `
-      <div class="loading" style="padding: 2rem; text-align: center;">
+    <div class="loading error-panel">
         <h2>Failed to load data</h2>
-        <p style="color: var(--text-muted); margin-top: 1rem; font-family: monospace; font-size: 0.9rem;">
+      <p class="error-message">
           ${error instanceof Error ? error.message : String(error)}
         </p>
-        <p style="color: var(--text-muted); margin-top: 0.5rem; font-size: 0.9rem;">
+      <p class="error-hint">
           Check the browser console for details. Make sure:<br/>
           • Dev server is running on port 3000<br/>
           • Data file exists at public/data/whaling_data.json<br/>
-          • Run: <code style="background: var(--bg-surface); padding: 0.2rem 0.4rem; border-radius: 3px;">uv run python data/process_data.py</code>
+        • Run: <code class="command-note">uv run python data/process_data.py</code>
         </p>
       </div>
     `;
@@ -469,11 +457,7 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
           clearHighlight();
           hideTooltip();
         })
-        .on('mousemove', function(event: MouseEvent) {
-          if (hoveredCountry) {
-            updateTooltipPosition(event);
-          }
-        });
+        ;
       
       console.log('Map countries created:', countries.selectAll('path').size());
     } else {
@@ -593,7 +577,8 @@ function updateVisualization() {
     const path = d3.select(this);
     
     if (!code) {
-      path.style('fill', null).attr('fill', null); // Let CSS handle default
+      path.style('fill', null);
+      path.attr('fill', null); // Let CSS handle default
       path.classed('whaling', false);
       noCodeCount++;
       return;
@@ -612,9 +597,8 @@ function updateVisualization() {
     
     if (catches > 0) {
       const color = colorScale(catches);
-      // Set both attribute and style to ensure it overrides CSS
-      // Use style with !important to override any CSS
-      path.style('fill', color).attr('fill', color);
+      // Set style with !important to ensure it overrides CSS
+      path.style('fill', color, 'important');
       path.classed('whaling', true);
       coloredCount++;
       // Log first few colored countries for debugging, including Greenland
@@ -622,8 +606,9 @@ function updateVisualization() {
         console.log(`Colored ${code}: ${catches} catches → ${color}`);
       }
     } else {
-      // Use CSS variable for default color
-      path.style('fill', null).attr('fill', null); // Let CSS handle default
+      // Use CSS variable for default color by removing style
+      path.style('fill', null);
+      path.attr('fill', null); // Also clear attribute just in case
       path.classed('whaling', false);
       noDataCount++;
     }
@@ -780,15 +765,6 @@ function showTooltip(event: MouseEvent, countryCode: string) {
   `);
   
   tooltip.classed('visible', true);
-  updateTooltipPosition(event);
-}
-
-function updateTooltipPosition(event: MouseEvent) {
-  const tooltip = d3.select('.tooltip');
-  const [x, y] = d3.pointer(event);
-  tooltip
-    .style('left', `${x + 15}px`)
-    .style('top', `${y - 10}px`);
 }
 
 function hideTooltip() {

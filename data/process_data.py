@@ -9,7 +9,8 @@ import json
 from pathlib import Path
 
 # Paths
-DOWNLOADS = Path.home() / "Downloads"
+# Look for Excel file in data/ directory (project root)
+DATA_DIR = Path(__file__).parent
 OUTPUT_DIR = Path(__file__).parent.parent / "public" / "data"
 
 # Species mapping (column name -> display name)
@@ -46,14 +47,16 @@ COUNTRY_CODES = {
 }
 
 def find_dataset():
-    """Find the most recent IWC catches dataset in Downloads."""
-    xlsx_files = list(DOWNLOADS.glob("*catches*.xlsx")) + list(DOWNLOADS.glob("*Catches*.xlsx"))
+    """Find the IWC catches dataset in the data/ directory."""
+    xlsx_files = list(DATA_DIR.glob("*catches*.xlsx")) + list(DATA_DIR.glob("*Catches*.xlsx"))
     if not xlsx_files:
         raise FileNotFoundError(
-            "No IWC catches dataset found in Downloads.\n"
-            "Download from: https://iwc.int/management-and-conservation/whaling/total-catches"
+            f"No IWC catches dataset found in {DATA_DIR}.\n"
+            "Download from: https://iwc.int/management-and-conservation/whaling/total-catches\n"
+            "Place the Excel file in the data/ directory."
         )
-    xlsx_files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
+    if len(xlsx_files) > 1:
+        print(f"⚠️  Multiple Excel files found, using: {xlsx_files[0].name}")
     return xlsx_files[0]
 
 def main():
