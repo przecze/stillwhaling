@@ -51,7 +51,7 @@ http {
     # --- Block common scanner paths ---
     location ~* \.(php|asp|aspx|jsp|cgi|pl|sh|py|rb)$ { return 404; }
 
-    location ~* ^/(admin|wp-admin|wp-login|administrator|phpmyadmin|mysql|sql|backup|config|\.env|\.git) {
+    location ~* ^/((admin|wp-admin|wp-login|wp-includes|wp-content|_ignition|administrator|phpmyadmin|mysql|sql|backup|config)/|\.env|\.git) {
       return 404;
     }
 
