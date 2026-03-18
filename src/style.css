@@ -196,20 +196,63 @@ h1 span {
 
 /* Species Filters */
 .filters {
-  display: flex;
-  gap: 0.5rem;
-  padding: 1rem 3rem;
   border-bottom: 1px solid var(--grid-line);
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 3rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filters-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.filters-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.filters-current {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.filters-toggle-icon {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.filters.expanded .filters-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.filters-body {
+  display: none;
+  gap: 0.5rem;
+  padding: 0.25rem 3rem 0.75rem;
   flex-wrap: wrap;
+}
+
+.filters.expanded .filters-body {
+  display: flex;
 }
 
 .filter-btn {
   background: transparent;
   border: 1px solid var(--grid-line);
   color: var(--text-muted);
-  padding: 0.4rem 0.9rem;
+  padding: 0.35rem 0.8rem;
   border-radius: 2rem;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: inherit;
@@ -229,7 +272,7 @@ h1 span {
 /* Timeline */
 .timeline-container {
   height: 140px;
-  padding: 1rem 3rem;
+  padding: 1rem 3rem 0;
   background: var(--bg-ocean);
   position: relative;
 }
@@ -309,7 +352,7 @@ h1 span {
 .map-container {
   flex: 1;
   position: relative;
-  background: 
+  background:
     radial-gradient(ellipse at 50% 100%, rgba(13, 24, 32, 0.9) 0%, transparent 70%),
     var(--bg-deep);
   overflow: hidden;
@@ -318,6 +361,15 @@ h1 span {
 .map-svg {
   width: 100%;
   height: 100%;
+}
+
+.map-bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 3rem;
+  border-top: 1px solid var(--grid-line);
+  flex-shrink: 0;
 }
 
 .country {
@@ -404,9 +456,6 @@ h1 span {
 
 /* Legend */
 .legend {
-  position: absolute;
-  bottom: 2rem;
-  left: 3rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -423,9 +472,6 @@ h1 span {
 
 /* Stats */
 .stats {
-  position: absolute;
-  bottom: 2rem;
-  right: 3rem;
   text-align: right;
 }
 

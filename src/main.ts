@@ -211,18 +211,45 @@ function render() {
     }
   });
   
-  // Species filters
+  // Compute species actually present in dataset
+  const speciesInDataset = new Set<string>();
+  data.byCountryYear.forEach(entry => {
+    Object.entries(entry.species).forEach(([code, count]) => {
+      if (count > 0) speciesInDataset.add(code);
+    });
+  });
+
+  // Species filters - collapsible
   const filtersDiv = app.append('div').attr('class', 'filters');
-  const speciesEntries = Object.entries(data.metadata.species);
-  
+
+  const filtersHeader = filtersDiv.append('div').attr('class', 'filters-header');
+  filtersHeader.append('span').attr('class', 'filters-label').text('Species');
+  filtersHeader.append('span').attr('class', 'filters-current').attr('id', 'filters-current').text('All');
+  filtersHeader.append('span').attr('class', 'filters-toggle-icon').text('▾');
+
+  const filtersBody = filtersDiv.append('div').attr('class', 'filters-body');
+
+  function updateFilterHeader() {
+    if (selectedSpecies.length === 0) {
+      d3.select('#filters-current').text('All');
+    } else if (selectedSpecies.length === 1) {
+      d3.select('#filters-current').text(data.metadata.species[selectedSpecies[0]] || selectedSpecies[0]);
+    } else {
+      d3.select('#filters-current').text(`${selectedSpecies.length} selected`);
+    }
+  }
+
+  const speciesEntries = Object.entries(data.metadata.species)
+    .filter(([code]) => speciesInDataset.has(code));
+
   speciesEntries.forEach(([code, name]) => {
-    filtersDiv.append('button')
+    filtersBody.append('button')
       .attr('class', 'filter-btn')
       .text(name)
       .on('click', function(this: HTMLButtonElement) {
         const btn = d3.select(this);
         const isActive = btn.classed('active');
-        
+
         if (isActive) {
           btn.classed('active', false);
           selectedSpecies = selectedSpecies.filter(s => s !== code);
@@ -230,32 +257,35 @@ function render() {
           btn.classed('active', true);
           selectedSpecies.push(code);
         }
-        
+
+        updateFilterHeader();
         updateVisualization();
       });
   });
-  
+
   // Add "All" button
-  filtersDiv.insert('button', ':first-child')
+  filtersBody.insert('button', ':first-child')
     .attr('class', 'filter-btn active')
-    .text('All Species')
+    .text('All')
     .on('click', function(this: HTMLButtonElement) {
       d3.selectAll('.filter-btn').classed('active', false);
       d3.select(this).classed('active', true);
       selectedSpecies = [];
+      updateFilterHeader();
       updateVisualization();
     });
+
+  filtersHeader.on('click', function() {
+    filtersDiv.classed('expanded', !filtersDiv.classed('expanded'));
+  });
   
   // Timeline
   createTimeline(app as any);
-  
+
   // Tooltip
   app.append('div').attr('class', 'tooltip');
-  
-  // Map (will call updateVisualization when ready)
-  createMap(app as any);
 
-  // Add footer
+  // Add footer before createMap so all siblings are in DOM for accurate flex measurement
   app.append('footer')
     .html(`
       <div class="footer-content">
@@ -264,7 +294,10 @@ function render() {
         <span>Data: <a href="https://iwc.int/management-and-conservation/whaling/total-catches" target="_blank" rel="noopener noreferrer">International Whaling Commision</a></span>
       </div>
     `);
-  
+
+  // Map (will call updateVisualization when ready)
+  createMap(app as any);
+
   // Initial visualization will be triggered by createMap when paths are ready
   // No setTimeout hack needed - createMap calls updateVisualization directly
 }
@@ -419,11 +452,24 @@ function createTimeline(container: d3.Selection<any, unknown, null, undefined>) 
 }
 
 function createMap(container: d3.Selection<any, unknown, null, undefined>) {
-  const mapDiv = container.append('div').attr('class', 'map-container');
-  
-  const width = window.innerWidth;
-  const height = window.innerHeight - 300; // Account for header, filters, timeline
-  
+  const mapDiv = container.insert('div', 'footer').attr('class', 'map-container');
+
+  // Create bottom bar before measuring so it occupies its space in the flex layout
+  const bottomBar = container.insert('div', 'footer').attr('class', 'map-bottom-bar');
+  const legend = bottomBar.append('div').attr('class', 'legend');
+  legend.append('div').attr('class', 'legend-label').text('Catches');
+  legend.append('div').attr('class', 'legend-gradient');
+  legend.append('div').attr('class', 'legend-label').text('High');
+  const stats = bottomBar.append('div').attr('class', 'stats');
+  stats.append('div').attr('class', 'stat-value').attr('id', 'stat-total').text('0');
+  stats.append('div').attr('class', 'stat-label').attr('id', 'stat-label').text(`Whale Catches in ${currentYear}`);
+
+  // Measure actual container dimensions — footer and bottom-bar are already in DOM
+  // so flex layout is fully resolved before we read clientWidth/clientHeight
+  const mapNode = mapDiv.node() as HTMLElement;
+  const width = mapNode.clientWidth || window.innerWidth;
+  const height = mapNode.clientHeight || window.innerHeight - 300;
+
   const svg = mapDiv.append('svg')
     .attr('class', 'map-svg')
     .attr('viewBox', `0 0 ${width} ${height}`);
@@ -499,17 +545,6 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
       .attr('fill', 'var(--text-muted)')
       .text('Error loading map');
   }
-  
-  // Legend
-  const legend = mapDiv.append('div').attr('class', 'legend');
-  legend.append('div').attr('class', 'legend-label').text('Catches');
-  legend.append('div').attr('class', 'legend-gradient');
-  legend.append('div').attr('class', 'legend-label').text('High');
-  
-  // Stats
-  const stats = mapDiv.append('div').attr('class', 'stats');
-  stats.append('div').attr('class', 'stat-value').attr('id', 'stat-total').text('0');
-  stats.append('div').attr('class', 'stat-label').attr('id', 'stat-label').text(`Whale Catches in ${currentYear}`);
   
   // Store for updates
   (window as any).mapCountries = countries;
@@ -835,7 +870,8 @@ window.addEventListener('resize', () => {
   resizeTimeout = window.setTimeout(() => {
     if (data && worldTopo) {
       // Re-render map on resize (only after resize stops)
-      d3.select('.map-container').select('svg').remove();
+      d3.select('.map-container').remove();
+      d3.select('.map-bottom-bar').remove();
       createMap(d3.select('#app') as any);
       updateVisualization();
     }
