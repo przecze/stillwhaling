@@ -310,12 +310,15 @@ function createTimeline(container: d3.Selection<any, unknown, null, undefined>) 
   header.append('div').attr('class', 'timeline-year').attr('id', 'timeline-year');
   
   const svg = timelineDiv.append('svg')
-    .attr('class', 'timeline-svg')
-    .attr('viewBox', '0 0 1000 80');
-  
+    .attr('class', 'timeline-svg');
+
+  const svgHeight = 80;
+  const totalWidth = (svg.node() as SVGSVGElement).getBoundingClientRect().width || 920;
+  svg.attr('viewBox', `0 0 ${totalWidth} ${svgHeight}`);
+
   const margin = { top: 10, right: 40, bottom: 20, left: 40 };
-  const width = 1000 - margin.left - margin.right;
-  const height = 80 - margin.top - margin.bottom;
+  const width = totalWidth - margin.left - margin.right;
+  const height = svgHeight - margin.top - margin.bottom;
   
   const g = svg.append('g')
     .attr('transform', `translate(${margin.left},${margin.top})`);
