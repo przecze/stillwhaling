@@ -535,6 +535,18 @@ h1 span {
   animation: pulse 1.5s infinite;
 }
 
+/* Desktop */
+@media (min-width: 601px) {
+  #app {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .map-svg {
+    height: 100%;
+  }
+}
+
 /* Mobile */
 @media (max-width: 600px) {
   .timeline-container {
