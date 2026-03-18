@@ -464,16 +464,10 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
   stats.append('div').attr('class', 'stat-value').attr('id', 'stat-total').text('0');
   stats.append('div').attr('class', 'stat-label').attr('id', 'stat-label').text(`Whale Catches in ${currentYear}`);
 
-  // Measure actual container dimensions — footer and bottom-bar are already in DOM
-  // so flex layout is fully resolved before we read clientWidth/clientHeight
+  // Measure actual container width
   const mapNode = mapDiv.node() as HTMLElement;
   const width = mapNode.clientWidth || window.innerWidth;
-  const height = mapNode.clientHeight || window.innerHeight - 300;
 
-  const svg = mapDiv.append('svg')
-    .attr('class', 'map-svg')
-    .attr('viewBox', `0 0 ${width} ${height}`);
-  
   // Extract world map features (do once, reuse)
   let worldFeatures: any = null;
   try {
@@ -481,19 +475,31 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
   } catch (error) {
     console.error('Error extracting world features:', error);
   }
-  
-  // Projection - handle case where worldTopo might be empty
+
+  // Compute the world's natural height at this width so the viewBox matches exactly
+  // — no letterboxing, no empty space inside the SVG coordinate space.
   let projection;
   let path;
+  let naturalHeight: number;
+
   if (worldFeatures && worldFeatures.features && worldFeatures.features.length > 0) {
-    projection = d3.geoNaturalEarth1()
-      .fitSize([width, height], worldFeatures);
+    // fitWidth centers horizontally; measure bounds to get the true aspect ratio
+    const refProj = d3.geoNaturalEarth1().fitWidth(width, worldFeatures);
+    const [[, ry0], [, ry1]] = d3.geoPath().projection(refProj).bounds(worldFeatures);
+    naturalHeight = Math.ceil(ry1 - ry0);
+
+    // Now fit to exact [width × naturalHeight] so world fills viewBox completely
+    projection = d3.geoNaturalEarth1().fitSize([width, naturalHeight], worldFeatures);
     path = d3.geoPath().projection(projection);
   } else {
-    // Empty projection if no map data
-    projection = d3.geoNaturalEarth1().fitSize([width, height], { type: 'FeatureCollection', features: [] });
+    naturalHeight = Math.round(width * 0.5);
+    projection = d3.geoNaturalEarth1().fitSize([width, naturalHeight], { type: 'FeatureCollection', features: [] });
     path = d3.geoPath().projection(projection);
   }
+
+  const svg = mapDiv.append('svg')
+    .attr('class', 'map-svg')
+    .attr('viewBox', `0 0 ${width} ${naturalHeight}`);
   
   // Draw countries
   const countries = svg.append('g').attr('class', 'countries');
@@ -531,7 +537,7 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
       // No map data - show message
       svg.append('text')
         .attr('x', width / 2)
-        .attr('y', height / 2)
+        .attr('y', naturalHeight / 2)
         .attr('text-anchor', 'middle')
         .attr('fill', 'var(--text-muted)')
         .text('World map data unavailable');
@@ -540,7 +546,7 @@ function createMap(container: d3.Selection<any, unknown, null, undefined>) {
     console.error('Error rendering map:', error);
     svg.append('text')
       .attr('x', width / 2)
-      .attr('y', height / 2)
+      .attr('y', naturalHeight / 2)
       .attr('text-anchor', 'middle')
       .attr('fill', 'var(--text-muted)')
       .text('Error loading map');
