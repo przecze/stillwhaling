@@ -35,6 +35,13 @@
   line-height: 1;
 }
 
+.chip-flag-img {
+  height: 14px;
+  width: auto;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
 .chip-name {
   font-size: 12px;
   color: var(--text-primary);

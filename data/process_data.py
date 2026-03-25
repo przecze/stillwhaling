@@ -33,7 +33,7 @@ SPECIES = {
 # Country name -> ISO 3166-1 alpha-3 code (for map)
 COUNTRY_CODES = {
     'Japan': 'JPN',
-    'USSR': 'RUS',  # Map to Russia for visualization
+    'USSR': 'SUN',
     'Russia': 'RUS',
     'Indonesia': 'IDN',
     'Denmark': 'DNK',  # Includes Greenland/Faroe Islands

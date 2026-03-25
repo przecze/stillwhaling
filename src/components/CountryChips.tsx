@@ -76,7 +76,11 @@ export default function CountryChips({ data, currentYear, selectedSpecies, onChi
           onMouseLeave={() => { if (!touchActiveRef.current) onChipHover(null); }}
           onTouchStart={(e) => { e.stopPropagation(); touchActiveRef.current = true; setTimeout(() => { touchActiveRef.current = false; }, 500); onChipHover({ code, mobile: true, key: Date.now() }); }}
         >
-          <span className="chip-flag">{getFlag(code)}</span>
+          <span className="chip-flag">
+            {code === 'SUN'
+              ? <img src="/flags/sun.svg" alt="USSR" className="chip-flag-img" />
+              : getFlag(code)}
+          </span>
           <span className="chip-name">{name}</span>
           <span className="chip-total">{total.toLocaleString()}</span>
         </div>
