@@ -3,21 +3,13 @@ import * as d3 from 'd3';
 import { feature } from 'topojson-client';
 import { WhalingData, CountryYearEntry } from '../types';
 import { ChipHover } from './CountryChips';
+import { RELATED_COUNTRY_MAP, RELATED_GROUPS } from '../constants';
 import './map.css';
 
 const NUMERIC_TO_ISO: Record<string, string> = {
   '392': 'JPN', '643': 'RUS', '360': 'IDN', '208': 'DNK', '304': 'GRL',
   '352': 'ISL', '578': 'NOR', '670': 'VCT', '410': 'KOR', '840': 'USA',
   '620': 'PRT', '124': 'CAN',
-};
-
-const RELATED_COUNTRY_MAP: Record<string, string> = {
-  'GRL': 'DNK',
-};
-
-const RELATED_GROUPS: Record<string, string[]> = {
-  'DNK': ['DNK', 'GRL'],
-  'GRL': ['DNK', 'GRL'],
 };
 
 function getCountryCode(d: any): string {
@@ -139,6 +131,9 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
     const latCropHeight = antarcticPt ? antarcticPt[1] : naturalHeight * 0.78;
     const croppedHeight = Math.round(Math.min(latCropHeight, mapDiv.clientHeight || latCropHeight));
 
+    // Cap the container to exactly the SVG's natural height so chips sit flush below
+    mapDiv.style.maxHeight = croppedHeight + 'px';
+
     const svg = d3.select(svgEl)
       .attr('class', 'map-svg')
       .attr('viewBox', `0 0 ${width} ${croppedHeight}`)
@@ -165,7 +160,7 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
           const code = getCountryCode(d);
           if (!code) return;
           onHoverCountry(code);
-          showTooltipFor(code, event, false);
+          showTooltipForRef.current(code, event, false);
           highlightCountry(code);
         })
         .on('pointermove', function(event: PointerEvent) {
@@ -184,7 +179,7 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
           const code = getCountryCode(d);
           if (!code) return;
           onHoverCountry(code);
-          showTooltipFor(code, null, true);
+          showTooltipForRef.current(code, null, true);
           highlightCountry(code);
         });
     } else {
@@ -198,10 +193,11 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
     colorCountriesRef.current();
 
     return () => {
+      mapDiv.style.maxHeight = '';
       if (svgRef.current) d3.select(svgRef.current).selectAll('*').remove();
       countriesRef.current = null!;
     };
-  }, [worldTopo]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [worldTopo]); // eslint-disable-line react-hooks/exhaustive-deps -- other values (data, year, species) are read via colorCountriesRef, not as deps
 
   // Update colors when year or species filter changes
   useEffect(() => {
@@ -294,7 +290,7 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
     } else {
       showTooltipForRef.current(code, null, true);
     }
-  }, [chipHover]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [chipHover]); // eslint-disable-line react-hooks/exhaustive-deps -- showTooltipFor is accessed via showTooltipForRef, not as a dep
 
   // Compute tooltip position
   function tooltipStyle(t: TooltipData) {
@@ -308,7 +304,7 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
     return { left, top };
   }
 
-  const tStyle = tooltip ? tooltipStyle(tooltip) : { left: 0, top: 0 };
+  const tooltipPosition = tooltip ? tooltipStyle(tooltip) : { left: 0, top: 0 };
 
   return (
     <>
@@ -325,7 +321,7 @@ export default function MapChart({ data, worldTopo, currentYear, selectedSpecies
       <div
         ref={tooltipRef}
         className={`tooltip${tooltip ? ' visible' : ''}${tooltip?.centered ? ' centered' : ''}`}
-        style={tooltip?.centered ? {} : { left: tStyle.left, top: tStyle.top }}
+        style={tooltip?.centered ? {} : { left: tooltipPosition.left, top: tooltipPosition.top }}
       >
         {tooltip && (
           <>

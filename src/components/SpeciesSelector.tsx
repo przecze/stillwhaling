@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { WhalingData } from '../types';
-import './speciesSelector.css';
+import './species-selector.css';
 
 interface Props {
   data: WhalingData;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function SpeciesSelector({ data, selectedSpecies, onSpeciesChange }: Props) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const speciesInDataset = useMemo(() => {
     const set = new Set<string>();

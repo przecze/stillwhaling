@@ -1,12 +1,8 @@
 import { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { WhalingData } from '../types';
+import { RELATED_GROUPS } from '../constants';
 import './timeline.css';
-
-const RELATED_COUNTRY_MAP: Record<string, string[]> = {
-  'DNK': ['DNK', 'GRL'],
-  'GRL': ['DNK', 'GRL'],
-};
 
 interface Props {
   data: WhalingData;
@@ -84,7 +80,7 @@ export default function Timeline({ data, currentYear, onYearChange, hoveredCount
       .call(d3.axisBottom(xScale).ticks(10).tickFormat(d => String(d)));
 
     // Interactions
-    function updateFromX(x: number, relative = false) {
+    function updateYearFromX(x: number, relative = false) {
       const adjusted = relative ? Math.max(0, Math.min(width, x)) : x - margin.left;
       if (adjusted >= 0 && adjusted <= width) {
         const year = Math.round(xScale.invert(adjusted));
@@ -96,18 +92,18 @@ export default function Timeline({ data, currentYear, onYearChange, hoveredCount
 
     svg.call(d3.drag<SVGSVGElement, unknown>().on('drag', function(event) {
       const [x] = d3.pointer(event, this);
-      updateFromX(x, false);
+      updateYearFromX(x, false);
     }));
 
     scrubber.call(d3.drag<SVGGElement, unknown>().on('drag', function(event) {
       const [x] = d3.pointer(event, svgEl);
-      updateFromX(x, false);
+      updateYearFromX(x, false);
     }));
 
     svg.on('click', function(event: MouseEvent) {
       if (event.detail === 1) {
         const [x] = d3.pointer(event, this);
-        updateFromX(x, false);
+        updateYearFromX(x, false);
       }
     });
 
@@ -119,7 +115,7 @@ export default function Timeline({ data, currentYear, onYearChange, hoveredCount
       areaFnRef.current = null!;
       countryAreaRef.current = null!;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- chart builds once; data and callbacks are captured via refs (xScaleRef, areaFnRef, currentYearRef)
 
   // Update scrubber position when year changes
   useEffect(() => {
@@ -141,7 +137,7 @@ export default function Timeline({ data, currentYear, onYearChange, hoveredCount
       return;
     }
 
-    const relatedCodes = RELATED_COUNTRY_MAP[hoveredCountry] || [hoveredCountry];
+    const relatedCodes = RELATED_GROUPS[hoveredCountry] || [hoveredCountry];
 
     const countryTimeline = data.timeline.map(yearEntry => {
       let total = 0;

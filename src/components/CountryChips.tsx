@@ -1,4 +1,6 @@
+import { useMemo, useRef } from 'react';
 import { WhalingData } from '../types';
+import { RELATED_COUNTRY_MAP } from '../constants';
 import './country-chips.css';
 
 const ISO3_TO_ISO2: Record<string, string> = {
@@ -10,9 +12,6 @@ const ISO3_TO_ISO2: Record<string, string> = {
   'VCT': 'VC', 'PHL': 'PH', 'TWN': 'TW', 'URY': 'UY', 'PER': 'PE',
   'ARG': 'AR', 'CHL': 'CL',
 };
-
-// Countries to merge into a primary (satellite → primary)
-const MERGE_INTO: Record<string, string> = { 'GRL': 'DNK' };
 
 function getFlag(iso3: string): string {
   const iso2 = ISO3_TO_ISO2[iso3];
@@ -37,30 +36,33 @@ interface Props {
 }
 
 export default function CountryChips({ data, currentYear, selectedSpecies, onChipHover, activeCode }: Props) {
-  const yearData = data.byCountryYear.filter(d => d.year === currentYear);
+  const touchActiveRef = useRef(false);
 
-  // Compute catches per code
-  const catchesByCode = new Map<string, number>();
-  const nameByCode = new Map<string, string>();
-  yearData.forEach(d => {
-    const catches = selectedSpecies.length > 0
-      ? selectedSpecies.reduce((sum, s) => sum + (d.species[s] || 0), 0)
-      : d.total;
-    catchesByCode.set(d.code, catches);
-    nameByCode.set(d.code, d.country);
-  });
+  const chips = useMemo(() => {
+    const yearData = data.byCountryYear.filter(d => d.year === currentYear);
 
-  // Merge satellites into primary codes
-  const merged = new Map<string, number>();
-  catchesByCode.forEach((catches, code) => {
-    const primary = MERGE_INTO[code] || code;
-    merged.set(primary, (merged.get(primary) || 0) + catches);
-  });
+    const catchesByCode = new Map<string, number>();
+    const nameByCode = new Map<string, string>();
+    yearData.forEach(d => {
+      const catches = selectedSpecies.length > 0
+        ? selectedSpecies.reduce((sum, s) => sum + (d.species[s] || 0), 0)
+        : d.total;
+      catchesByCode.set(d.code, catches);
+      nameByCode.set(d.code, d.country);
+    });
 
-  const chips = Array.from(merged.entries())
-    .filter(([, total]) => total > 0)
-    .map(([code, total]) => ({ code, name: nameByCode.get(code) || code, total }))
-    .sort((a, b) => b.total - a.total);
+    // Merge satellites into primary codes
+    const merged = new Map<string, number>();
+    catchesByCode.forEach((catches, code) => {
+      const primary = RELATED_COUNTRY_MAP[code] || code;
+      merged.set(primary, (merged.get(primary) || 0) + catches);
+    });
+
+    return Array.from(merged.entries())
+      .filter(([, total]) => total > 0)
+      .map(([code, total]) => ({ code, name: nameByCode.get(code) || code, total }))
+      .sort((a, b) => b.total - a.total);
+  }, [data, currentYear, selectedSpecies]);
 
   if (chips.length === 0) return null;
 
@@ -70,9 +72,9 @@ export default function CountryChips({ data, currentYear, selectedSpecies, onChi
         <div
           key={code}
           className={`country-chip${activeCode === code ? ' active' : ''}`}
-          onMouseEnter={() => onChipHover({ code, mobile: false, key: Date.now() })}
-          onMouseLeave={() => onChipHover(null)}
-          onTouchStart={(e) => { e.stopPropagation(); onChipHover({ code, mobile: true, key: Date.now() }); }}
+          onMouseEnter={() => { if (!touchActiveRef.current) onChipHover({ code, mobile: false, key: Date.now() }); }}
+          onMouseLeave={() => { if (!touchActiveRef.current) onChipHover(null); }}
+          onTouchStart={(e) => { e.stopPropagation(); touchActiveRef.current = true; setTimeout(() => { touchActiveRef.current = false; }, 500); onChipHover({ code, mobile: true, key: Date.now() }); }}
         >
           <span className="chip-flag">{getFlag(code)}</span>
           <span className="chip-name">{name}</span>
