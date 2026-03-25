@@ -1,0 +1,47 @@
+.country-chips-bar {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+}
+
+.country-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--bg-surface);
+  border: 1px solid rgba(122, 155, 181, 0.15);
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.country-chip:hover,
+.country-chip.active {
+  border-color: var(--accent-blood-dim);
+  background: rgba(194, 59, 34, 0.08);
+}
+
+.chip-flag {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.chip-name {
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.chip-total {
+  font-size: 11px;
+  color: var(--accent-blood);
+  font-variant-numeric: tabular-nums;
+}

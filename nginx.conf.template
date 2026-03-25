@@ -20,6 +20,12 @@ http {
     ''      close;
   }
 
+  map "${DEV_MODE}" $coop_policy {
+    default "same-origin";
+    "true"  "unsafe-none";
+    "1"     "unsafe-none";
+  }
+
   map "${DEV_MODE}" $dev_style_inline {
     default "";
     "true"  " 'unsafe-inline'";
@@ -44,7 +50,7 @@ http {
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
-    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Cross-Origin-Opener-Policy $coop_policy always;
     add_header Cross-Origin-Resource-Policy "same-site" always;
     add_header Content-Security-Policy "default-src 'none'; script-src 'self'${dev_script_policy}; style-src 'self' https://fonts.googleapis.com${dev_style_inline}; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://unpkg.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none';" always;
 
@@ -58,6 +64,20 @@ http {
     # Allow Vite dev dependencies before the catch-all rule that would return 404.
     location ^~ /node_modules/ {
       try_files $uri $uri/ @vite;
+    }
+
+    # Allow Vite dev source paths (e.g. /src/components/*.tsx)
+    location ^~ /src/ {
+      try_files $uri @vite;
+    }
+
+    # Allow Vite internal paths
+    location ^~ /@vite/ {
+      try_files $uri @vite;
+    }
+
+    location ^~ /@fs/ {
+      try_files $uri @vite;
     }
 
     # Optional route protection (still safe with Vite)

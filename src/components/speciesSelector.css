@@ -1,0 +1,84 @@
+/* Species Filters */
+.filters {
+  border-bottom: 1px solid var(--grid-line);
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 3rem 0.55rem 1rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filters-header:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.filters-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.filters-current {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+}
+
+.filters-toggle-icon {
+  font-size: 1.4rem;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.filters.expanded .filters-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.filters-body {
+  display: none;
+  gap: 0.5rem;
+  padding: 0.25rem 3rem 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filters.expanded .filters-body {
+  display: flex;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--grid-line);
+  color: var(--text-muted);
+  padding: 0.35rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.filter-btn:hover {
+  border-color: var(--text-muted);
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background: var(--accent-blood);
+  border-color: var(--accent-blood);
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .filters-header {
+    padding: 0.55rem 1rem 0.55rem 1rem;
+  }
+
+  .filters-body {
+    padding: 0.25rem 1rem 0.75rem;
+  }
+}

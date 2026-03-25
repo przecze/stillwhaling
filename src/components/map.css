@@ -1,0 +1,134 @@
+/* Map */
+.map-container {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(13, 24, 32, 0.9) 0%, transparent 70%),
+    var(--bg-deep);
+  overflow: hidden;
+}
+
+.map-svg-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.map-stats-overlay {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.country {
+  fill: var(--bg-surface);
+  stroke: none;
+  transition: fill 0.3s ease;
+}
+
+.country.whaling {
+  stroke: var(--grid-line);
+  stroke-width: 0.5;
+  cursor: pointer;
+}
+
+.country.whaling:hover {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.country.highlighted {
+  stroke: var(--accent-warm);
+  stroke-width: 2;
+  filter: brightness(1.2);
+}
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--bg-surface);
+  border: 1px solid var(--grid-line);
+  padding: 1rem;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+  min-width: 220px;
+  max-width: 320px;
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip.centered {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.tooltip-country {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.tooltip-total {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-blood);
+}
+
+.tooltip-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tooltip-species {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tooltip-species-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.tooltip-species-name {
+  color: var(--text-muted);
+}
+
+.tooltip-species-count {
+  color: var(--text-primary);
+}
+
+/* Stats */
+
+.stat-value {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-size: 2.5rem;
+  color: var(--accent-blood);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

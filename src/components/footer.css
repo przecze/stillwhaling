@@ -1,0 +1,37 @@
+/* Footer */
+footer {
+  padding: 0.75rem 3rem;
+  border-top: 1px solid var(--grid-line);
+  background: var(--bg-deep);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  z-index: 10;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-content a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-content a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.footer-divider {
+  color: var(--grid-line);
+}
+
+@media (max-width: 600px) {
+  footer {
+    padding: 0.75rem 1rem;
+  }
+}

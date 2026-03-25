@@ -302,6 +302,49 @@ async function runTests() {
       // Don't fail - this is a feature check
     }
 
+    // Test 7: Country chips are positioned right below the map (not at page bottom)
+    console.log('7. Testing country chips placement...');
+    try {
+      await page.waitForSelector('.country-chips-bar', { timeout: 5000 });
+
+      const layout = await page.evaluate(() => {
+        const chips = document.querySelector('.country-chips-bar');
+        const map = document.querySelector('.map-container');
+        if (!chips || !map) return null;
+
+        const chipsRect = chips.getBoundingClientRect();
+        const mapRect = map.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        return {
+          mapBottom: Math.round(mapRect.bottom),
+          chipsTop: Math.round(chipsRect.top),
+          chipsHeight: Math.round(chipsRect.height),
+          chipsVisible: chipsRect.height > 0 && chipsRect.top < viewportHeight,
+          gap: Math.round(chipsRect.top - mapRect.bottom),
+          viewportHeight,
+        };
+      });
+
+      if (!layout) throw new Error('.country-chips-bar or .map-container not found');
+
+      console.log(`      map bottom=${layout.mapBottom}, chips top=${layout.chipsTop}, gap=${layout.gap}px, viewport=${layout.viewportHeight}`);
+
+      if (!layout.chipsVisible) {
+        throw new Error(`Chips bar not visible in viewport (chipsTop=${layout.chipsTop}, viewport=${layout.viewportHeight})`);
+      }
+      if (Math.abs(layout.gap) > 20) {
+        throw new Error(`Chips not adjacent to map: gap is ${layout.gap}px (expected < 20px)`);
+      }
+
+      console.log(`   ✅ Country chips positioned right below map (gap: ${layout.gap}px)`);
+      passed++;
+    } catch (error) {
+      console.log(`   ❌ Country chips placement: ${error.message}`);
+      failed++;
+      errors.push(`Chips placement: ${error.message}`);
+    }
+
     // Summary
     console.log('\n' + '='.repeat(50));
     console.log(`Results: ${passed} passed, ${failed} failed`);
